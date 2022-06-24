@@ -85,21 +85,21 @@ func (r *InMemoryRepository[Key, Entity]) Delete(key Key) error {
 	return nil
 }
 
-func (r *InMemoryRepository[Key, Entity]) FindById(key Key) (Entity, bool) {
+func (r *InMemoryRepository[Key, Entity]) FindById(key Key) (Entity, error) {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 	r.init()
 
 	if !r.AllowEmptyKey && key == r.emptyKey {
 		var entity Entity
-		return entity, false
+		return entity, invalidKey
 	}
 
 	if entity, found := r.elementsById[key]; found {
-		return entity, true
+		return entity, nil
 	}
 	var empty Entity
-	return empty, false
+	return empty, notFound
 }
 
 func (r *InMemoryRepository[Key, Entity]) FindBy(predicate types.Predicate[Entity]) []Entity {
