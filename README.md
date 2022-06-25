@@ -1,4 +1,5 @@
 # Gollections - A collections' library for Golang generics
+![Gollections](gollections.png)
 
 [![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/mod/github.com/totemcaf/gollections)
 
@@ -78,17 +79,40 @@ package main
 import (
     "fmt"
 
-    "github.com/totemcaf/gollections/lists"
+    "github.com/totemcaf/gollections/slices"
 )
 
 func main() {
-    strings := lists.Of("hi", "Hello", "world")
+    strings := slices.Of("hi", "Hello", "world")
 
-    fmt.Printf("%s, found at %d", "hello", lists.Index(strings, "hello"))
+    fmt.Printf("%s, found at %d", "hello", slices.Index(strings, "hello"))
 }
 ```
 
 Composing the fluent style you can do, for example:
+
+```go
+package main
+
+import (
+    "fmt"
+
+    "github.com/totemcaf/gollections/slices"
+)
+
+func main() {
+    words := slices.Of("hi", "Hello", "world")
+
+    wordSize := func(w string) int {return len(w)}
+    isLong := func(n int) bool {return n > 4}
+    
+    longWordCount := slices.Count(slices.Map(words, wordSize), isLong) 
+
+    fmt.Printf("found %d long words", longWordCount)
+}
+```
+
+Or you can use the `List[T]` type:
 
 ```go
 package main
@@ -102,11 +126,24 @@ import (
 func main() {
     words := lists.Of("hi", "Hello", "world")
 
-    wordSize := func(w string) int {return len(w)}
-    isLong := func(n int) bool {return n > 4}
-    
-    longWordCount := lists.Count(lists.Map(words, wordSize), isLong) 
+    wordSize := func(w string) int { return len(w) }
+    isLong := func(n int) bool { return n > 4 }
+
+    longWordCount := lists.Map(words, wordSize).CountBy(isLong)
 
     fmt.Printf("found %d long words", longWordCount)
+
+    isLongWord := func(s string) bool { return len(s) > 4 }
+
+    fmt.Printf("another way to found %d long words", words.FilterBy(isLongWord).Count())
+
+    numbers := lists.Of(42, 12, 34, 666)
+
+    square := func(n int) int { return n * n }
+    sumOfInts := func(sum, n int) int { return sum + n }
+
+    sumOfSquares := numbers.Map(square).Reduce(sumOfInts)
+
+    fmt.Println("Sum of squares of ints", sumOfSquares)
 }
 ```
