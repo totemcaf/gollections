@@ -3,7 +3,7 @@ package lists
 import "github.com/totemcaf/gollections/types"
 
 type List[T any] interface {
-	Unmarshal(data []byte) error
+	// UnmarshalJSON(data []byte) error
 	// Append returns a list with all the elements of this and a new one to the end of the list
 	Append(T) List[T]
 	// AppendAll returns a list with all the elements of this and a all new ones to the end of the list

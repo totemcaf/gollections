@@ -35,8 +35,8 @@ func Test_added_element_it_is_found(t *testing.T) {
 
 	_, _ = repo.Create(toStore)
 
-	entity, found := repo.FindById(Key1)
-	assert.True(t, found)
+	entity, err := repo.FindById(Key1)
+	assert.Nil(t, err)
 	assert.Equal(t, toStore, entity)
 }
 
@@ -107,9 +107,9 @@ func Test_Update_replace_entity(t *testing.T) {
 	_, _ = repo.Create(&entity{Key1, 42})
 	_, _ = repo.Update(&entity{Key1, 4242})
 
-	entity, found := repo.FindById(Key1)
+	entity, err := repo.FindById(Key1)
 
-	assert.True(t, found)
+	assert.Nil(t, err)
 	assert.Equal(t, Key1, entity.Id)
 	assert.Equal(t, 4242, entity.Value)
 }
