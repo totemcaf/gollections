@@ -26,7 +26,7 @@ When using a version of Go that does not support modules, the library can be ins
 
 # Usage
 
-You can see more detail in [API documentation](https://pkg.go.dev/github.com/totemcaf/gollections@v0.3.0-b).
+You can see more detail in [API documentation](https://pkg.go.dev/github.com/totemcaf/gollections).
 
 Instead of writing
 
