@@ -4,8 +4,8 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/totemcaf/gollections/lists"
 	"github.com/totemcaf/gollections/maps"
+	"github.com/totemcaf/gollections/slices"
 	"github.com/totemcaf/gollections/types"
 )
 
@@ -107,7 +107,7 @@ func (r *InMemoryRepository[Key, Entity]) FindBy(predicate types.Predicate[Entit
 	defer r.lock.RUnlock()
 
 	// This is not the most efficient way to do it, but this repository is meant for tests
-	return lists.Filter(maps.Values(r.elementsById), predicate)
+	return slices.Filter(maps.Values(r.elementsById), predicate)
 }
 
 func (r *InMemoryRepository[Key, Entity]) TotalCount() int {

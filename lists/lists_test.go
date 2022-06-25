@@ -1,29 +1,33 @@
-package lists_test
+package lists
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/totemcaf/gollections/lists"
 )
 
-func TestCount_counts_elements(t *testing.T) {
-	list := lists.Of("some", "words", "to", "count")
+func TestReduce(t *testing.T) {
+	reducer := func(sum int, s string) int { return sum + len(s) }
 
-	isLong := func(w string) bool { return len(w) > 2 }
-
-	count := lists.Count(list, isLong)
-
-	assert.Equal(t, 3, count)
-}
-
-func TestMap_maps_a_list(t *testing.T) {
-	list := lists.Of("some", "words", "to", "count")
-
-	wordLength := func(s string) int { return len(s) }
-
-	mapped := lists.Map(list, wordLength)
-
-	assert.Len(t, mapped, len(list))
-	assert.Equal(t, []int{4, 5, 2, 5}, mapped)
+	tests := []struct {
+		name string
+		args List[string]
+		want int
+	}{
+		{
+			name: "empty",
+			args: Of[string](),
+			want: 0,
+		},
+		{
+			name: "not empty",
+			args: Of("hello", "world"),
+			want: 10,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, Reduce(tt.args, reducer), "Reduce(%v)", tt.args)
+		})
+	}
 }

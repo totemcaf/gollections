@@ -1,4 +1,4 @@
-package slist
+package lists
 
 import (
 	"encoding/json"

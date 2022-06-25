@@ -1,19 +1,17 @@
-package slist
+package lists
 
 import (
 	"reflect"
 	"strings"
 	"testing"
-
-	"github.com/totemcaf/gollections/lists"
 )
 
 func Test_sliceList_AppendAll(t *testing.T) {
 	tests := []struct {
 		name string
-		s    lists.List[string]
+		s    List[string]
 		args []string
-		want lists.List[string]
+		want List[string]
 	}{
 		{
 			name: "Empty and empty",
@@ -52,7 +50,7 @@ func Test_sliceList_AppendAll(t *testing.T) {
 func Test_sliceList_Count(t *testing.T) {
 	tests := []struct {
 		name string
-		s    lists.List[string]
+		s    List[string]
 		want int
 	}{
 		{
@@ -83,7 +81,7 @@ func Test_sliceList_Count(t *testing.T) {
 func Test_sliceList_At2(t *testing.T) {
 	tests := []struct {
 		name  string
-		s     lists.List[string]
+		s     List[string]
 		idx   int
 		want  string
 		found bool
@@ -149,8 +147,8 @@ func Test_sliceList_Map(t *testing.T) {
 
 	tests := []struct {
 		name string
-		s    lists.List[string]
-		want lists.List[string]
+		s    List[string]
+		want List[string]
 	}{
 		{
 			name: "no elements",
@@ -178,9 +176,9 @@ func Test_sliceList_FilterBy(t *testing.T) {
 
 	tests := []struct {
 		name string
-		s    lists.List[string]
+		s    List[string]
 		idx  int
-		want lists.List[string]
+		want List[string]
 	}{
 		{
 			name: "no elements",
