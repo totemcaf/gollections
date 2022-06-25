@@ -3,12 +3,16 @@
 
 [![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/mod/github.com/totemcaf/gollections)
 
-Gollections is a small library with helper functions to handle common collections in a type safe manner.
+Gollections is a small library with helper functions and nre types to handle common collections in a type safe manner.
 
-It uses the new generics support in GO that allows to create generic functions let the compiler check the use
-of the correct types.
+It uses the new generics support in GO that allows to create generic functions and types to let the compiler
+check the correct use of types.
 
 # Requirements
+
+This library requires GO 1.18 or newer because it is based on the new generics support.
+
+See https://go.dev/doc/go1.18
 
 # Installation
 
@@ -21,6 +25,8 @@ When using a version of Go that does not support modules, the library can be ins
     dep ensure -add "github.com/totemcaf/gollections"
 
 # Usage
+
+You can see more detail in [API documentation](https://pkg.go.dev/github.com/totemcaf/gollections@v0.3.0-b).
 
 Instead of writing
 
