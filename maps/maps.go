@@ -93,12 +93,35 @@ func ReduceEntries[Value any, Key comparable, Element any](
 	return accum
 }
 
-// Map maps values. Returns a new Map with same keys and values transformed by map function
+// Map maps values. Returns a new Map with same keys and values transformed by map function.
 func Map[K comparable, V any, W any](m map[K]V, mapper types.Mapper[V, W]) map[K]W {
 	result := make(map[K]W, len(m))
 
 	for k, v := range m {
 		result[k] = mapper(v)
+	}
+
+	return result
+}
+
+// MapKeys maps keys. Returns a new Map with keys transformed by map function and same values.
+func MapKeys[K, W comparable, V any](m map[K]V, mapper types.Mapper[K, W]) map[W]V {
+	result := make(map[W]V, len(m))
+
+	for k, v := range m {
+		result[mapper(k)] = v
+	}
+
+	return result
+}
+
+// MapEntries maps keys and values. Returns a new Map with keys and values transformed by map functions.
+func MapEntries[K, TK comparable, V, TV any](m map[K]V, mapper func(K, V) (TK, TV)) map[TK]TV {
+	result := make(map[TK]TV, len(m))
+
+	for k, v := range m {
+		tk, tv := mapper(k, v)
+		result[tk] = tv
 	}
 
 	return result

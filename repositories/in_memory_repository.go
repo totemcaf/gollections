@@ -11,7 +11,7 @@ import (
 
 var invalidKey = errors.New("invalid key, nil")
 var notFound = errors.New("not found")
-var foundMany = errors.New("find one but found many")
+var foundMany = errors.New("wants one but found many")
 var duplicateKey = errors.New("key is duplicated")
 
 type InMemoryRepository[Key comparable, Entity any] struct {
@@ -117,7 +117,8 @@ func (r *InMemoryRepository[Key, Entity]) FindOneBy(predicate types.Predicate[En
 
 	switch len(found) {
 	case 0:
-		return nil, notFound
+		var empty Entity
+		return empty, notFound
 	case 1:
 		return found[0], nil
 	default:

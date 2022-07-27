@@ -135,6 +135,36 @@ func Test_FindBy_founds_entities(t *testing.T) {
 	allEquals(t, expected, entities)
 }
 
+func Test_FindOneBy_founds_one_entity(t *testing.T) {
+	repo := newRepo()
+	_, _ = repo.Create(&entity{"a-key-001", 4200})
+	_, _ = repo.Create(&entity{"a-key-002", 42})
+	_, _ = repo.Create(&entity{"a-key-003", 35})
+	_, _ = repo.Create(&entity{"a-key-004", 179})
+
+	greaterThan1000 := func(e *entity) bool { return e.Value > 1000 }
+
+	found, err := repo.FindOneBy(greaterThan1000)
+
+	assert.Nil(t, err)
+	expected := entity{"a-key-001", 4200}
+	assert.Equal(t, &expected, found)
+}
+
+func Test_FindOneBy_fails_if_more_than_one_entity_is_found(t *testing.T) {
+	repo := newRepo()
+	_, _ = repo.Create(&entity{"a-key-001", 4200})
+	_, _ = repo.Create(&entity{"a-key-002", 42})
+	_, _ = repo.Create(&entity{"a-key-003", 35})
+	_, _ = repo.Create(&entity{"a-key-004", 179})
+
+	greaterThan100 := func(e *entity) bool { return e.Value > 100 }
+
+	_, err := repo.FindOneBy(greaterThan100)
+
+	assert.ErrorContains(t, err, "wants one but found many")
+}
+
 func allEquals[T any](t *testing.T, expected []T, entities []T) bool {
 	if !assert.Len(t, entities, len(expected)) {
 		return false
