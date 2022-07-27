@@ -63,7 +63,7 @@ func Remove[T types.Comparable[T]](ts []T, toRemove T) []T {
 	return FilterNot(ts, func(t T) bool { return toRemove.Compare(t) == 0 })
 }
 
-// Any returns true if at lease one element satisfies predicate
+// Any returns true if at least one element satisfies predicate
 func Any[T any](ts []T, predicate func(t T) bool) bool {
 	for _, t := range ts {
 		if predicate(t) {

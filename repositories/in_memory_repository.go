@@ -11,6 +11,7 @@ import (
 
 var invalidKey = errors.New("invalid key, nil")
 var notFound = errors.New("not found")
+var foundMany = errors.New("find one but found many")
 var duplicateKey = errors.New("key is duplicated")
 
 type InMemoryRepository[Key comparable, Entity any] struct {
@@ -108,6 +109,20 @@ func (r *InMemoryRepository[Key, Entity]) FindBy(predicate types.Predicate[Entit
 
 	// This is not the most efficient way to do it, but this repository is meant for tests
 	return slices.Filter(maps.Values(r.elementsById), predicate)
+}
+
+// FindOneBy returns the first element that satisfies the predicate. If more than one or none found, returns an error.
+func (r *InMemoryRepository[Key, Entity]) FindOneBy(predicate types.Predicate[Entity]) (Entity, error) {
+	found := r.FindBy(predicate)
+
+	switch len(found) {
+	case 0:
+		return nil, notFound
+	case 1:
+		return found[0], nil
+	default:
+		return found[0], foundMany
+	}
 }
 
 func (r *InMemoryRepository[Key, Entity]) TotalCount() int {
