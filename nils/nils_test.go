@@ -54,16 +54,31 @@ func Test_Copy_returns_copied_value_for_not_nil(t *testing.T) {
 func Test_CastOrNil_returns_nil_for_nil(t *testing.T) {
 	var aNil *string = nil
 
-	assert.Equal(t, aNil, CastOrNil[string](aNil))
+	assert.Equal(t, aNil, CastOrNil[*string](aNil))
+}
+
+type ISample interface {
+	GetValue() string
 }
 
 type sample struct {
 	aValue string
 }
 
+func (s *sample) GetValue() string {
+	return s.aValue
+}
+
 func Test_CastOrNil_returns_casted_value_for_not_nil(t *testing.T) {
 	var aValue sample = sample{aString}
 
-	assert.Equal(t, &aValue, CastOrNil[sample](&aValue))
-	assert.IsType(t, &sample{}, CastOrNil[sample](&aValue))
+	assert.Equal(t, &aValue, CastOrNil[*sample](&aValue))
+	assert.IsType(t, &sample{}, CastOrNil[*sample](&aValue))
+}
+
+func Test_CastOrNil_returns_casted_value_for_interfaces(t *testing.T) {
+	var aValue sample = sample{aString}
+
+	assert.Equal(t, &aValue, CastOrNil[ISample](&aValue))
+	assert.IsType(t, &sample{}, CastOrNil[ISample](&aValue))
 }

@@ -36,12 +36,13 @@ func Copy[T any](value *T) *T {
 	return &t
 }
 
-func CastOrNil[T any](value any) *T {
+func CastOrNil[T any](value any) T {
 	if value == nil {
-		return nil
+		var t T
+		return t
 	}
 
-	t, ok := value.(*T)
+	t, ok := value.(T)
 
 	if !ok {
 		panic("cannot cast value to type " + reflect.TypeOf(value).String())
