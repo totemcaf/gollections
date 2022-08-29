@@ -17,12 +17,12 @@ func Map[S any, T any](ss []S, m types.Mapper[S, T]) []T {
 }
 
 // MapNonNil apply mapper to all elements of 'ss' and return slice of all non-nil results
-func MapNonNil[S any, T any](ss []S, mapper types.Mapper[S, *T]) []*T {
-	us := make([]*T, len(ss))
+func MapNonNil[S any, T any](ss []S, mapper types.Mapper[S, *T]) []T {
+	us := make([]T, 0, len(ss))
 
-	for idx, s := range ss {
+	for _, s := range ss {
 		if t := mapper(s); t != nil {
-			us[idx] = t
+			us = append(us, *t)
 		}
 	}
 
