@@ -86,7 +86,7 @@ func (r *InMemoryRepository[Key, Entity]) Delete(key Key) error {
 	return nil
 }
 
-func (r *InMemoryRepository[Key, Entity]) FindById(key Key) (Entity, error) {
+func (r *InMemoryRepository[Key, Entity]) FindByID(key Key) (Entity, error) {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 	r.init()
