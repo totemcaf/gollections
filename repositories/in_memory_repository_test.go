@@ -165,16 +165,23 @@ func Test_FindOneBy_fails_if_more_than_one_entity_is_found(t *testing.T) {
 	assert.ErrorContains(t, err, "wants one but found many")
 }
 
-func allEquals[T any](t *testing.T, expected []T, entities []T) bool {
-	if !assert.Len(t, entities, len(expected)) {
+func allEquals[T any](t *testing.T, expected []T, actual []T) bool {
+	if !assert.Len(t, actual, len(expected)) {
 		return false
 	}
 
-	for idx, e := range entities {
-		if !assert.Equal(t, expected[idx], e) {
+	for idx, e := range actual {
+		if !assert.Contains(t, actual, expected[idx], e) {
 			return false
 		}
 	}
+
+	for idx, e := range expected {
+		if !assert.Contains(t, expected, actual[idx], e) {
+			return false
+		}
+	}
+
 	return true
 }
 
