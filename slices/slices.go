@@ -144,11 +144,11 @@ func Has2[T comparable](ts []T, other T) bool {
 	return false
 }
 
-func DeepCloneSlice[T types.Cloneable[T]](source []T) []T {
+func DeepClone[T types.Cloneable[T]](source []T) []T {
 	return Map(source, func(t T) T { return t.Clone() })
 }
 
-func CloneSlice[T any](source []T) []T {
+func Clone[T any](source []T) []T {
 	target := make([]T, len(source))
 
 	copy(target, source)

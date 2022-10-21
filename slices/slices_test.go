@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/totemcaf/gollections/slices"
+	"github.com/totemcaf/gollections/types"
 )
 
 func TestCount_counts_elements(t *testing.T) {
@@ -247,4 +248,181 @@ func TestRemove(t *testing.T) {
 			assert.Equalf(t, tt.want, slices.Remove(tt.args.ts, tt.args.toRemove), "Remove(%v, %v)", tt.args.ts, tt.args.toRemove)
 		})
 	}
+}
+
+func TestClone_duplicates(t *testing.T) {
+	// GIVEN a slice
+	s := []int{1, 2, 3}
+
+	// WHEN I clone it
+	c := slices.Clone(s)
+
+	// THEN the clone is equal to the original
+	assert.Equal(t, s, c)
+
+	// AND the clone is not the same slice
+	assert.NotSame(t, s, c)
+}
+
+func TestFilterNonNil_returns_not_nil_elements(t *testing.T) {
+	// GIVEN a slice with nil and not nil elements
+	one := 1
+	two := 2
+	three := 3
+	s := []*int{nil, &one, nil, &two, &three, nil}
+
+	// WHEN I filter it
+	f := slices.FilterNonNil(s)
+
+	// THEN the result contains only not nil elements
+	assert.Equal(t, []*int{&one, &two, &three}, f)
+}
+
+func TestIndexBy2_can_find(t *testing.T) {
+	// GIVEN a slice
+	s := []int{1, 2, 3}
+
+	// WHEN I index it
+	i, found := slices.IndexBy2(s, func(i int) bool {
+		return i == 2
+	})
+
+	// THEN I can find the element
+	assert.True(t, found)
+	assert.Equal(t, 1, i)
+}
+
+func TestIndexBy2(t *testing.T) {
+	equalTo := func(i int) func(int) bool {
+		return func(j int) bool {
+			return i == j
+		}
+	}
+
+	type args struct {
+		ss []int
+		p  types.Predicate[int]
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      int
+		wantFound bool
+	}{
+		{
+			name: "empty",
+			args: args{
+				ss: []int{},
+				p:  equalTo(1),
+			},
+			want:      -1,
+			wantFound: false,
+		},
+		{
+			name: "not found",
+			args: args{
+				ss: []int{1, 2, 3},
+				p:  equalTo(4),
+			},
+			want:      -1,
+			wantFound: false,
+		},
+		{
+			name: "found",
+			args: args{
+				ss: []int{1, 2, 3},
+				p:  equalTo(2),
+			},
+			want:      1,
+			wantFound: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, got1 := slices.IndexBy2(tt.args.ss, tt.args.p)
+			assert.Equalf(t, tt.want, got, "IndexBy2(%v, %v)", tt.args.ss, tt.args.p)
+			assert.Equalf(t, tt.wantFound, got1, "IndexBy2(%v, %v)", tt.args.ss, tt.args.p)
+		})
+	}
+}
+
+type sampleComparable string
+
+func (s sampleComparable) Compare(other sampleComparable) int {
+	return strings.Compare(string(s), string(other))
+}
+
+func TestHas(t *testing.T) {
+	type args struct {
+		ts    []sampleComparable
+		other sampleComparable
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "empty",
+			args: args{
+				ts:    []sampleComparable{},
+				other: sampleComparable("something"),
+			},
+			want: false,
+		},
+		{
+			name: "not found",
+			args: args{
+				ts:    []sampleComparable{sampleComparable("something"), sampleComparable("else")},
+				other: sampleComparable("not found"),
+			},
+			want: false,
+		},
+		{
+			name: "found",
+			args: args{
+				ts:    []sampleComparable{sampleComparable("something"), sampleComparable("else")},
+				other: sampleComparable("something"),
+			},
+			want: true,
+		},
+		{
+			name: "found several times",
+			args: args{
+				ts:    []sampleComparable{sampleComparable("something"), sampleComparable("else"), sampleComparable("something")},
+				other: sampleComparable("something"),
+			},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, slices.Has(tt.args.ts, tt.args.other), "Has(%v, %v)", tt.args.ts, tt.args.other)
+		})
+	}
+}
+
+type sampleStruct struct {
+	foo string
+}
+
+func (s sampleStruct) Clone() sampleStruct {
+	return sampleStruct{foo: s.foo}
+}
+
+func TestDeepClone(t *testing.T) {
+	// GIVEN a slice
+	s := []sampleStruct{{foo: "bar"}}
+
+	// WHEN I clone it
+	c := slices.DeepClone(s)
+
+	// THEN the clone is equal to the original
+	assert.Equal(t, s, c)
+
+	// AND the clone is not the same slice
+	assert.NotSame(t, s, c)
+
+	// AND the clone is not the same struct
+	assert.NotSame(t, s[0], c[0])
 }
