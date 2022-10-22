@@ -2,6 +2,7 @@ package types
 
 type Predicate[T any] func(T) bool
 type Mapper[S any, T any] func(S) T
+type MapperWithError[S any, T any] func(S) (T, error)
 
 type Function1[T any] func(T)
 

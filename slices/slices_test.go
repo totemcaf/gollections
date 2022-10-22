@@ -1,6 +1,8 @@
 package slices_test
 
 import (
+	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -425,4 +427,48 @@ func TestDeepClone(t *testing.T) {
 
 	// AND the clone is not the same struct
 	assert.NotSame(t, s[0], c[0])
+}
+
+func TestMapWithError(t *testing.T) {
+	doublePositive := func(i int) (int, error) {
+		if i < 0 {
+			return 0, errors.New("negative")
+		}
+		return i * 2, nil
+	}
+
+	tests := []struct {
+		name    string
+		args    []int
+		want    []int
+		wantErr assert.ErrorAssertionFunc
+	}{
+		{
+			name:    "empty",
+			args:    []int{},
+			want:    []int{},
+			wantErr: assert.NoError,
+		},
+		{
+			name:    "no error",
+			args:    []int{1, 2, 3},
+			want:    []int{2, 4, 6},
+			wantErr: assert.NoError,
+		},
+		{
+			name:    "error",
+			args:    []int{1, -2, 3},
+			want:    nil,
+			wantErr: assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := slices.MapWithError(tt.args, doublePositive)
+			if !tt.wantErr(t, err, fmt.Sprintf("MapWithError(%v, %v)", tt.args, "doublePositive")) {
+				return
+			}
+			assert.Equalf(t, tt.want, got, "MapWithError(%v, %v)", tt.args, "doublePositive")
+		})
+	}
 }

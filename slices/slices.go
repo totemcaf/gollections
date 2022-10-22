@@ -16,6 +16,20 @@ func Map[S any, T any](ss []S, m types.Mapper[S, T]) []T {
 	return tt
 }
 
+// MapWithError applies mapper to all elements of 'ss' and returns slice of results.
+// If mapper returns error, then it is returned immediately.
+func MapWithError[S any, T any](ss []S, m types.MapperWithError[S, T]) ([]T, error) {
+	tt := make([]T, len(ss))
+	var err error
+	for idx, s := range ss {
+		tt[idx], err = m(s)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return tt, nil
+}
+
 // MapNonNil apply mapper to all elements of 'ss' and return slice of all non-nil results
 func MapNonNil[S any, T any](ss []S, mapper types.Mapper[S, *T]) []T {
 	us := make([]T, 0, len(ss))
