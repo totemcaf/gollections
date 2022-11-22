@@ -1,6 +1,7 @@
 package slices
 
 import (
+	"github.com/totemcaf/gollections/sets"
 	"github.com/totemcaf/gollections/types"
 )
 
@@ -183,4 +184,14 @@ func Reduce[Value any, Element any](
 	}
 
 	return accum
+}
+
+func JoinDistinct[T comparable](es ...[]T) []T {
+	result := sets.New[T]()
+
+	for _, e := range es {
+		result.AddAll(e...)
+	}
+
+	return result.Values()
 }
