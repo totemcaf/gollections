@@ -7,7 +7,7 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-func TestMinInt(t *testing.T) {
+func TestNMinInt(t *testing.T) {
 	type args[N constraints.Ordered] struct {
 		a N
 		b N
@@ -36,13 +36,13 @@ func TestMinInt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Min(tt.args.a, tt.args.b); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Min() = %v, want %v", got, tt.want)
+			if got := NMin(tt.args.a, tt.args.b); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NMin() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
-func TestMinSeveralInts(t *testing.T) {
+func TestNMinSeveralInts(t *testing.T) {
 	type testCase[N constraints.Ordered] struct {
 		name string
 		args []N
@@ -72,14 +72,14 @@ func TestMinSeveralInts(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Min(tt.args[0], tt.args[1:]...); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Min() = %v, want %v", got, tt.want)
+			if got := NMin(tt.args[0], tt.args[1:]...); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NMin() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestMax(t *testing.T) {
+func TestNMax(t *testing.T) {
 	type args[N constraints.Ordered] struct {
 		a N
 		b N
@@ -108,8 +108,8 @@ func TestMax(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Max(tt.args.a, tt.args.b); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Max() = %v, want %v", got, tt.want)
+			if got := NMax(tt.args.a, tt.args.b); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NMax() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -167,6 +167,68 @@ func TestClamp(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Clamp(tt.args.value, tt.args.min, tt.args.max); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Clamp() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestMin(t *testing.T) {
+	type args[N constraints.Ordered] struct {
+		a N
+		b N
+	}
+	type testCase[N constraints.Ordered] struct {
+		name string
+		args args[N]
+		want N
+	}
+	tests := []testCase[float64]{
+		{
+			name: "second",
+			args: args[float64]{a: 223.45, b: 112.24},
+			want: 112.24,
+		},
+		{
+			name: "first",
+			args: args[float64]{a: 42.125, b: 2368.45},
+			want: 42.125,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Min(tt.args.a, tt.args.b); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Min() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestMax(t *testing.T) {
+	type args[N constraints.Ordered] struct {
+		a N
+		b N
+	}
+	type testCase[N constraints.Ordered] struct {
+		name string
+		args args[N]
+		want N
+	}
+	tests := []testCase[string]{
+		{
+			name: "second",
+			args: args[string]{a: "one", b: "two"},
+			want: "two",
+		},
+		{
+			name: "first",
+			args: args[string]{a: "twelve", b: "four"},
+			want: "twelve",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Max(tt.args.a, tt.args.b); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Max() = %v, want %v", got, tt.want)
 			}
 		})
 	}
