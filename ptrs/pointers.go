@@ -6,3 +6,8 @@ func SetIfPresent[T any](target *T, value *T) {
 		*target = *value
 	}
 }
+
+// Ptr returns a pointer to a value
+func Ptr[T any](value T) *T {
+	return &value
+}
