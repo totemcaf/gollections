@@ -472,3 +472,33 @@ func TestMapWithError(t *testing.T) {
 		})
 	}
 }
+
+func TestCastAll(t *testing.T) {
+	type testCase[S any, T any] struct {
+		name string
+		args []S
+		want []T
+	}
+	tests := []testCase[interface{}, string]{
+		{
+			name: "empty",
+			args: []interface{}{},
+			want: []string{},
+		},
+		{
+			name: "one element",
+			args: []interface{}{"hello"},
+			want: []string{"hello"},
+		},
+		{
+			name: "several elements",
+			args: []interface{}{"hello", "world", "!"},
+			want: []string{"hello", "world", "!"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, slices.CastAll[any, string](tt.args), "CastAll(%v)", tt.args)
+		})
+	}
+}

@@ -195,3 +195,14 @@ func JoinDistinct[T comparable](es ...[]T) []T {
 
 	return result.Values()
 }
+
+// CastAll converts the type of all elements of the slice
+// If an element cannot be converted, it will panic
+func CastAll[S any, T any](ss []S) []T {
+	tt := make([]T, len(ss))
+	for idx, s := range ss {
+		var a any = s
+		tt[idx] = a.(T)
+	}
+	return tt
+}
