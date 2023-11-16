@@ -82,3 +82,82 @@ func Test_CastOrNil_returns_casted_value_for_interfaces(t *testing.T) {
 	assert.Equal(t, &aValue, CastOrNil[ISample](&aValue))
 	assert.IsType(t, &sample{}, CastOrNil[ISample](&aValue))
 }
+
+func TestOrDefaultF(t *testing.T) {
+	type args[T any] struct {
+		value        *T
+		defaultValue func() T
+	}
+	type testCase[T any] struct {
+		name string
+		args args[T]
+		want T
+	}
+	tests := []testCase[string]{
+		{
+			name: "value is not nil",
+			args: args[string]{
+				value:        &aString,
+				defaultValue: func() string { return "bbb" },
+			},
+			want: aString,
+		},
+		{
+			name: "value is nil",
+			args: args[string]{
+				value:        nil,
+				defaultValue: func() string { return "bbb" },
+			},
+			want: "bbb",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, OrDefaultF(tt.args.value, tt.args.defaultValue), "OrDefaultF(%v, %v)", tt.args.value, tt.args.defaultValue)
+		})
+	}
+}
+
+func TestCoalesce(t *testing.T) {
+	type args[T any] struct {
+		values []*T
+	}
+	type testCase[T any] struct {
+		name      string
+		args      args[T]
+		want      T
+		wantPanic bool
+	}
+	tests := []testCase[string]{
+		{
+			name: "first value is not nil",
+			args: args[string]{
+				values: []*string{&aString, nil},
+			},
+			want: aString,
+		},
+		{
+			name: "first value is nil",
+			args: args[string]{
+				values: []*string{nil, &aString},
+			},
+			want: aString,
+		},
+		{
+			name: "all values are nil",
+			args: args[string]{
+				values: []*string{nil, nil, nil, nil},
+			},
+			wantPanic: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.wantPanic {
+				assert.Panicsf(t, func() { Coalesce(tt.args.values...) }, "Coalesce(%v)", tt.args.values)
+			} else {
+				assert.Equalf(t, tt.want, Coalesce(tt.args.values...), "Coalesce(%v)", tt.args.values)
+			}
+		})
+	}
+}

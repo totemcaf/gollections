@@ -10,9 +10,20 @@ func IsNotNil[T any](t *T) bool {
 	return !IsNil(t)
 }
 
-// OrDefault Return value if no nil of default value in the other case
+// OrDefault Return value if no nil of default value in the another case
 func OrDefault[T any](value *T, defaultValue T) T {
-	return Coalesce(value, &defaultValue)
+	if value != nil {
+		return *value
+	}
+	return defaultValue
+}
+
+// OrDefaultF Return value if no nil of default value from function in the another case
+func OrDefaultF[T any](value *T, defaultValue func() T) T {
+	if value != nil {
+		return *value
+	}
+	return defaultValue()
 }
 
 // Coalesce Returns first no-nil value or panic if none
