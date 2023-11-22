@@ -44,16 +44,16 @@ func MapNonNil[S any, T any](ss []S, mapper types.Mapper[S, *T]) []T {
 	return us
 }
 
-func FlatMap[S any, T any](ss []S, m types.Mapper[S, []T]) []T {
-	tt := make([]T, 0, len(ss))
+func FlatMap[SS ~[]S, S any, TS ~[]T, T any](ss SS, m types.Mapper[S, TS]) TS {
+	tt := make(TS, 0, len(ss))
 	for _, s := range ss {
 		tt = append(tt, m(s)...)
 	}
 	return tt
 }
 
-func Filter[S any](ss []S, p types.Predicate[S]) []S {
-	var tt []S
+func Filter[SS ~[]S, S any](ss SS, p types.Predicate[S]) SS {
+	var tt SS
 	for _, s := range ss {
 		if p(s) {
 			tt = append(tt, s)
@@ -63,8 +63,8 @@ func Filter[S any](ss []S, p types.Predicate[S]) []S {
 }
 
 // FilterNot removes (filter out) all elements the satisfies predicate
-func FilterNot[S any](ss []S, p types.Predicate[S]) []S {
-	var tt []S
+func FilterNot[SS ~[]S, S any](ss SS, p types.Predicate[S]) SS {
+	var tt SS
 	for _, s := range ss {
 		if !p(s) {
 			tt = append(tt, s)
@@ -74,7 +74,7 @@ func FilterNot[S any](ss []S, p types.Predicate[S]) []S {
 }
 
 // Remove all occurrences of the given element from the slice
-func Remove[T types.Comparable[T]](ts []T, toRemove T) []T {
+func Remove[TS ~[]T, T types.Comparable[T]](ts TS, toRemove T) TS {
 	return FilterNot(ts, func(t T) bool { return toRemove.Compare(t) == 0 })
 }
 
@@ -89,7 +89,7 @@ func Any[T any](ts []T, predicate func(t T) bool) bool {
 }
 
 // FilterNonNil returns all the elements of array that are non nil
-func FilterNonNil[T any](ts []*T) []*T {
+func FilterNonNil[TS ~[]*T, T any](ts TS) TS {
 	return Filter(ts, func(t *T) bool { return t != nil })
 }
 
@@ -150,20 +150,22 @@ func Has[T types.Comparable[T]](ts []T, other T) bool {
 	return false
 }
 
+// Has2 returns true if the slice contains the given element
+// Deprecated: use Contains instead
 func Has2[T comparable](ts []T, other T) bool {
-	for _, t := range ts {
-		if t == other {
-			return true
-		}
-	}
-	return false
+	return Contains(ts, other)
 }
 
-func DeepClone[T types.Cloneable[T]](source []T) []T {
-	return Map(source, func(t T) T { return t.Clone() })
+// Contains returns true if the slice contains the given element
+func Contains[T comparable](ts []T, other T) bool {
+	return Index(ts, other) >= 0
 }
 
-func Clone[T any](source []T) []T {
+func DeepClone[SS ~[]S, S types.Cloneable[S]](source SS) SS {
+	return Map(source, func(t S) S { return t.Clone() })
+}
+
+func Clone[TS ~[]T, T any](source TS) TS {
 	target := make([]T, len(source))
 
 	copy(target, source)
@@ -186,7 +188,7 @@ func Reduce[Value any, Element any](
 	return accum
 }
 
-func JoinDistinct[T comparable](es ...[]T) []T {
+func JoinDistinct[TS ~[]T, T comparable](es ...TS) TS {
 	result := sets.New[T]()
 
 	for _, e := range es {
@@ -198,8 +200,8 @@ func JoinDistinct[T comparable](es ...[]T) []T {
 
 // CastAll converts the type of all elements of the slice
 // If an element cannot be converted, it will panic
-func CastAll[S any, T any](ss []S) []T {
-	tt := make([]T, len(ss))
+func CastAll[SS ~[]S, S any, TS ~[]T, T any](ss SS) TS {
+	tt := make(TS, len(ss))
 	for idx, s := range ss {
 		var a any = s
 		tt[idx] = a.(T)

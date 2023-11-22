@@ -498,7 +498,50 @@ func TestCastAll(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equalf(t, tt.want, slices.CastAll[any, string](tt.args), "CastAll(%v)", tt.args)
+			assert.Equalf(t, tt.want, slices.CastAll[[]any, any, []string, string](tt.args), "CastAll(%v)", tt.args)
+		})
+	}
+}
+
+func TestFilter(t *testing.T) {
+	type args[SS ~[]S, S any] struct {
+		ss SS
+		p  types.Predicate[S]
+	}
+	type testCase[SS ~[]S, S any] struct {
+		name string
+		args args[SS, S]
+		want SS
+	}
+	tests := []testCase[[]string, string]{
+		{
+			name: "empty",
+			args: args[[]string, string]{
+				ss: []string{},
+				p:  func(s string) bool { return len(s) > 2 },
+			},
+			want: nil,
+		},
+		{
+			name: "not found",
+			args: args[[]string, string]{
+				ss: []string{"a", "b", "c"},
+				p:  func(s string) bool { return len(s) > 2 },
+			},
+			want: nil,
+		},
+		{
+			name: "found",
+			args: args[[]string, string]{
+				ss: []string{"a", "bb", "ccc"},
+				p:  func(s string) bool { return len(s) > 2 },
+			},
+			want: []string{"ccc"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, slices.Filter(tt.args.ss, tt.args.p), "Filter(%v)", tt.args.ss)
 		})
 	}
 }
