@@ -208,3 +208,8 @@ func CastAll[SS ~[]S, S any, TS ~[]T, T any](ss SS) TS {
 	}
 	return tt
 }
+
+// HasDuplicates returns true if the slice contains at least one element duplicated
+func HasDuplicates[TS ~[]T, T comparable](ts TS) bool {
+	return len(ts) != sets.Of[T](ts...).Size()
+}

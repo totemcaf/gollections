@@ -545,3 +545,43 @@ func TestFilter(t *testing.T) {
 		})
 	}
 }
+
+func TestHasDuplicates(t *testing.T) {
+	type testCase[TS ~[]T, T comparable] struct {
+		name string
+		args TS
+		want bool
+	}
+	tests := []testCase[[]string, string]{
+		{
+			name: "empty",
+			args: []string{},
+			want: false,
+		},
+		{
+			name: "no duplicates",
+			args: []string{"a", "b", "c"},
+			want: false,
+		},
+		{
+			name: "one duplicate",
+			args: []string{"a", "b", "c", "a"},
+			want: true,
+		},
+		{
+			name: "several duplicates",
+			args: []string{"a", "b", "c", "a", "b", "c"},
+			want: true,
+		},
+		{
+			name: "several duplicates of the same element",
+			args: []string{"a", "a", "a", "a", "a", "a"},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, slices.HasDuplicates(tt.args), "HasDuplicates(%v)", tt.args)
+		})
+	}
+}
