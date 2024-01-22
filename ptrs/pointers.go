@@ -40,3 +40,13 @@ func One[T Number]() *T {
 	t := T(1)
 	return &t
 }
+
+// Coalesce returns the first non-nil pointer in the list
+func Coalesce[T any](values ...*T) *T {
+	for _, v := range values {
+		if v != nil {
+			return v
+		}
+	}
+	return nil
+}

@@ -93,3 +93,44 @@ func Test_One(t *testing.T) {
 	require.Equal(t, Ptr[int32](1), One[int32]())
 	require.Equal(t, int32(1), *One[int32]())
 }
+
+func TestCoalesce(t *testing.T) {
+	type args[T any] struct {
+		values []*T
+	}
+	type testCase[T any] struct {
+		name string
+		args args[T]
+		want *T
+	}
+	tests := []testCase[string]{
+		{
+			name: "first",
+			args: args[string]{
+				values: []*string{Ptr("first"), Ptr("second")},
+			},
+			want: Ptr("first"),
+		},
+		{
+			name: "second",
+			args: args[string]{
+				values: []*string{nil, Ptr("second")},
+			},
+			want: Ptr("second"),
+		},
+		{
+			name: "nil",
+			args: args[string]{
+				values: []*string{nil, nil, nil},
+			},
+			want: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Coalesce(tt.args.values...); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Coalesce() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
