@@ -213,3 +213,26 @@ func CastAll[SS ~[]S, S any, TS ~[]T, T any](ss SS) TS {
 func HasDuplicates[TS ~[]T, T comparable](ts TS) bool {
 	return len(ts) != sets.Of[T](ts...).Size()
 }
+
+// RemoveAt removes the element at the given index by shifting all elements after it to the left
+func RemoveAt[T any](elements []T, idx int) []T { //
+	if idx < 0 || idx >= len(elements) {
+		return elements
+	}
+	newElements := make([]T, len(elements)-1)
+	copy(newElements, elements[:idx])
+	copy(newElements[idx:], elements[idx+1:])
+	return newElements
+}
+
+// InsertAt inserts the given element at the given index by shifting all elements after it to the right
+func InsertAt[T any](elements []T, idx int, element T) []T {
+	if idx < 0 || idx > len(elements) {
+		panic("index out of bounds")
+	}
+	newElements := make([]T, len(elements)+1)
+	copy(newElements, elements[:idx])
+	newElements[idx] = element
+	copy(newElements[idx+1:], elements[idx:])
+	return newElements
+}

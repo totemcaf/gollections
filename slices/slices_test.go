@@ -585,3 +585,193 @@ func TestHasDuplicates(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveAt(t *testing.T) {
+	type args[T any] struct {
+		elements []T
+		idx      int
+	}
+	type testCase[T any] struct {
+		name string
+		args args[T]
+		want []T
+	}
+	tests := []testCase[string]{
+		{
+			name: "empty",
+			args: args[string]{
+				elements: []string{},
+				idx:      0,
+			},
+			want: []string{},
+		},
+		{
+			name: "nil",
+			args: args[string]{
+				elements: nil,
+				idx:      0,
+			},
+			want: nil,
+		},
+		{
+			name: "one element",
+			args: args[string]{
+				elements: []string{"a"},
+				idx:      0,
+			},
+			want: []string{},
+		},
+		{
+			name: "several elements",
+			args: args[string]{
+				elements: []string{"a", "b", "c"},
+				idx:      1,
+			},
+			want: []string{"a", "c"},
+		},
+		{
+			name: "several elements at the beginning",
+			args: args[string]{
+				elements: []string{"a", "b", "c"},
+				idx:      0,
+			},
+			want: []string{"b", "c"},
+		},
+		{
+			name: "several elements at the end",
+			args: args[string]{
+				elements: []string{"a", "b", "c"},
+				idx:      2,
+			},
+			want: []string{"a", "b"},
+		},
+		{
+			name: "before the beginning",
+			args: args[string]{
+				elements: []string{"a", "b", "c"},
+				idx:      -1,
+			},
+			want: []string{"a", "b", "c"},
+		},
+		{
+			name: "after the end",
+			args: args[string]{
+				elements: []string{"a", "b", "c"},
+				idx:      3,
+			},
+			want: []string{"a", "b", "c"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, slices.RemoveAt(tt.args.elements, tt.args.idx), "RemoveAt(%v, %v)", tt.args.elements, tt.args.idx)
+		})
+	}
+}
+
+func TestInsertAt(t *testing.T) {
+	type args[T any] struct {
+		elements []T
+		idx      int
+		element  T
+	}
+	type testCase[T any] struct {
+		name       string
+		args       args[T]
+		want       []T
+		wantPanics bool
+	}
+	tests := []testCase[string]{
+		{
+			name: "empty",
+			args: args[string]{
+				elements: []string{},
+				idx:      0,
+				element:  "a",
+			},
+			want: []string{"a"},
+		},
+		{
+			name: "nil",
+			args: args[string]{
+				elements: nil,
+				idx:      0,
+				element:  "a",
+			},
+			want: []string{"a"},
+		},
+		{
+			name: "one element, left",
+			args: args[string]{
+				elements: []string{"a"},
+				idx:      0,
+				element:  "b",
+			},
+			want: []string{"b", "a"},
+		},
+		{
+			name: "one element, right",
+			args: args[string]{
+				elements: []string{"a"},
+				idx:      1,
+				element:  "b",
+			},
+			want: []string{"a", "b"},
+		},
+		{
+			name: "several elements, left",
+			args: args[string]{
+				elements: []string{"a", "b", "c"},
+				idx:      0,
+				element:  "d",
+			},
+			want: []string{"d", "a", "b", "c"},
+		},
+		{
+			name: "several elements, right",
+			args: args[string]{
+				elements: []string{"a", "b", "c"},
+				idx:      3,
+				element:  "d",
+			},
+			want: []string{"a", "b", "c", "d"},
+		},
+		{
+			name: "several elements, middle",
+			args: args[string]{
+				elements: []string{"a", "b", "c"},
+				idx:      1,
+				element:  "d",
+			},
+			want: []string{"a", "d", "b", "c"},
+		},
+		{
+			name: "before the beginning",
+			args: args[string]{
+				elements: []string{"a", "b", "c"},
+				idx:      -1,
+				element:  "d",
+			},
+			wantPanics: true,
+		},
+		{
+			name: "after the end",
+			args: args[string]{
+				elements: []string{"a", "b", "c"},
+				idx:      4,
+				element:  "d",
+			},
+			wantPanics: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.wantPanics {
+				assert.Panicsf(t, func() { slices.InsertAt(tt.args.elements, tt.args.idx, tt.args.element) }, "InsertAt(%v, %v, %v)", tt.args.elements, tt.args.idx, tt.args.element)
+				return
+			}
+
+			assert.Equalf(t, tt.want, slices.InsertAt(tt.args.elements, tt.args.idx, tt.args.element), "InsertAt(%v, %v, %v)", tt.args.elements, tt.args.idx, tt.args.element)
+		})
+	}
+}
